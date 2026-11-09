@@ -7,6 +7,11 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  checks: write
+  actions: read
+
 jobs:
   build-and-test:
     name: Build & Test Yoru iOS Client
@@ -71,6 +76,8 @@ jobs:
           python3 Scripts/source_structure_lint.py
 
       - name: Run Swift Package Unit Tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -o pipefail
           swift test -v 2>&1 | tee swift_test.log || {
@@ -85,12 +92,17 @@ jobs:
           echo "### Swift Package Tests Passed Successfully" >> $GITHUB_STEP_SUMMARY
 
       - name: Validate Xcode Project Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -o pipefail
-          echo "=== Inspecting Xcode Schemes & Targets ==="
+          echo "=== Xcode Available SDKs ==="
+          xcodebuild -showsdks
+
+          echo "=== Xcode Schemes & Targets ==="
           xcodebuild -list -project Yoru.xcodeproj
 
-          echo "=== Discovering Available Build Destinations ==="
+          echo "=== Scheme Destinations ==="
           xcodebuild -showdestinations -project Yoru.xcodeproj -scheme Yoru || true
 
           echo "=== Executing Xcode Build for Generic iOS Device ==="
