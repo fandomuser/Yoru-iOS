@@ -7,11 +7,6 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
-permissions:
-  contents: write
-  checks: write
-  actions: read
-
 jobs:
   build-and-test:
     name: Build & Test Yoru iOS Client
@@ -20,8 +15,6 @@ jobs:
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - name: Select Xcode Version
         run: |
@@ -93,14 +86,14 @@ jobs:
       - name: Validate Xcode Project Build
         run: |
           set -o pipefail
-          echo "=== Xcode Available SDKs ==="
-          xcodebuild -showsdks
-
-          echo "=== Xcode Schemes & Targets ==="
-          xcodebuild -list -project Yoru.xcodeproj
-
-          echo "=== Scheme Destinations ==="
-          xcodebuild -showdestinations -project Yoru.xcodeproj -scheme Yoru || true
+          {
+            echo "=== Discovering Installed Xcode SDKs ==="
+            xcodebuild -showsdks || true
+            echo "=== Inspecting Xcode Schemes & Targets ==="
+            xcodebuild -list -project Yoru.xcodeproj || true
+            echo "=== Discovering Available Build Destinations ==="
+            xcodebuild -showdestinations -project Yoru.xcodeproj -scheme Yoru || true
+          } > xcode_info.log 2>&1
 
           echo "=== Executing Xcode Build for iOS Simulator ==="
           xcodebuild build \
@@ -113,7 +106,7 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             AD_HOC_CODE_SIGNING_ALLOWED=YES \
-            ONLY_ACTIVE_ARCH=NO 2>&1 | tee xcodebuild.log || {
+            ONLY_ACTIVE_ARCH=NO > xcodebuild.log 2>&1 || {
             STATUS=$?
             echo "### Xcode Build Failed (Exit $STATUS)" >> $GITHUB_STEP_SUMMARY
             echo '```text' >> $GITHUB_STEP_SUMMARY
@@ -123,16 +116,19 @@ jobs:
           }
           echo "### Xcode Build Succeeded Successfully" >> $GITHUB_STEP_SUMMARY
 
-      - name: Publish Build Logs to Git Branch
+      - name: Emit Diagnostics as Warnings
         if: always()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan ci-logs
-          git rm -rf . || true
-          git add -f swift_test.log xcodebuild.log || true
-          git commit -m "ci: publish raw logs for run ${{ github.run_number }} [skip ci]" || true
-          git push -f origin ci-logs || true
+          if [ -f xcode_info.log ]; then
+            cat xcode_info.log | head -n 25 | while IFS= read -r line; do
+              [ -n "$line" ] && echo "::warning title=XcodeInfo::$line"
+            done
+          fi
+          if [ -f xcodebuild.log ]; then
+            cat xcodebuild.log | tail -n 30 | while IFS= read -r line; do
+              [ -n "$line" ] && echo "::warning title=XcodeBuildLog::$line"
+            done
+          fi
 
       - name: Upload Build and Test Logs
         if: always()
@@ -141,5 +137,6 @@ jobs:
           name: build-and-test-logs
           path: |
             swift_test.log
+            xcode_info.log
             xcodebuild.log
           if-no-files-found: ignore
