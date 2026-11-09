@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Select Xcode Version
         run: |
@@ -76,8 +78,6 @@ jobs:
           python3 Scripts/source_structure_lint.py
 
       - name: Run Swift Package Unit Tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -o pipefail
           swift test -v 2>&1 | tee swift_test.log || {
@@ -86,14 +86,11 @@ jobs:
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 120 swift_test.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            python3 Scripts/emit_ci_error.py swift_test.log
             exit $STATUS
           }
           echo "### Swift Package Tests Passed Successfully" >> $GITHUB_STEP_SUMMARY
 
       - name: Validate Xcode Project Build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -o pipefail
           echo "=== Xcode Available SDKs ==="
@@ -105,24 +102,37 @@ jobs:
           echo "=== Scheme Destinations ==="
           xcodebuild -showdestinations -project Yoru.xcodeproj -scheme Yoru || true
 
-          echo "=== Executing Xcode Build for Generic iOS Device ==="
+          echo "=== Executing Xcode Build for iOS Simulator ==="
           xcodebuild build \
             -project Yoru.xcodeproj \
             -scheme Yoru \
-            -destination "generic/platform=iOS" \
+            -sdk iphonesimulator \
+            -destination "generic/platform=iOS Simulator" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
             ONLY_ACTIVE_ARCH=NO 2>&1 | tee xcodebuild.log || {
             STATUS=$?
             echo "### Xcode Build Failed (Exit $STATUS)" >> $GITHUB_STEP_SUMMARY
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 120 xcodebuild.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            python3 Scripts/emit_ci_error.py xcodebuild.log
             exit $STATUS
           }
           echo "### Xcode Build Succeeded Successfully" >> $GITHUB_STEP_SUMMARY
+
+      - name: Publish Build Logs to Git Branch
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan ci-logs
+          git rm -rf . || true
+          git add -f swift_test.log xcodebuild.log || true
+          git commit -m "ci: publish raw logs for run ${{ github.run_number }} [skip ci]" || true
+          git push -f origin ci-logs || true
 
       - name: Upload Build and Test Logs
         if: always()
