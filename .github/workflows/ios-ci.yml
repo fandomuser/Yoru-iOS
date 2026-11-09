@@ -88,26 +88,44 @@ jobs:
           set -o pipefail
           echo "=== Inspecting Xcode Schemes & Targets ==="
           xcodebuild -list -project Yoru.xcodeproj
-          echo "=== Executing iOS Simulator Build ==="
+
+          echo "=== Discovering Available Build Destinations ==="
+          xcodebuild -showdestinations -project Yoru.xcodeproj -scheme Yoru || true
+
+          # Identify available iPhone simulator or fall back to generic iOS platform
+          SIM_NAME=$(xcrun simctl list devices available | grep -E "iPhone (15|16|14)" | head -n 1 | sed -E 's/^[[:space:]]+//' | sed -E 's/ \(.*//')
+          if [ -n "$SIM_NAME" ]; then
+            DEST="platform=iOS Simulator,name=$SIM_NAME"
+          else
+            DEST="generic/platform=iOS"
+          fi
+          echo "=== Selected Destination: $DEST ==="
+
           xcodebuild build \
             -project Yoru.xcodeproj \
             -scheme Yoru \
-            -destination "generic/platform=iOS Simulator" \
+            -destination "$DEST" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             ONLY_ACTIVE_ARCH=NO 2>&1 | tee xcodebuild.log || {
             STATUS=$?
-            echo "### Xcode Simulator Build Failed (Exit $STATUS)" >> $GITHUB_STEP_SUMMARY
+            echo "### Xcode Build Failed (Exit $STATUS)" >> $GITHUB_STEP_SUMMARY
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 120 xcodebuild.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            grep -E "error:" xcodebuild.log | head -n 30 | while IFS= read -r line; do
-              echo "::error::$line"
-            done
+            python3 -c "
+import sys
+try:
+    with open('xcodebuild.log') as f:
+        for l in [x.strip() for x in f if x.strip()][-25:]:
+            print('::error::' + l)
+except Exception:
+    pass
+"
             exit $STATUS
           }
-          echo "### Xcode Simulator Build Succeeded Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "### Xcode Build Succeeded Successfully" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Build and Test Logs
         if: always()
