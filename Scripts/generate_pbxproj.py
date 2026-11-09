@@ -377,6 +377,11 @@ def main():
 \t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;\n\t\t\t\tSWIFT_VERSION = 5.0;
 \t\t\t\tSUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 \t\t\t\tSUPPORTS_MACCATALYST = NO;
+\t\t\t\tOTHER_LDFLAGS = (
+\t\t\t\t\t"$(inherited)",
+\t\t\t\t\t"-lc++",
+\t\t\t\t\t"-lz",
+\t\t\t\t);
 \t\t\t\tTARGETED_DEVICE_FAMILY = 1;
 \t\t\t}};
 \t\t\tname = Debug;
@@ -404,6 +409,11 @@ def main():
 \t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;\n\t\t\t\tSWIFT_VERSION = 5.0;
 \t\t\t\tSUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 \t\t\t\tSUPPORTS_MACCATALYST = NO;
+\t\t\t\tOTHER_LDFLAGS = (
+\t\t\t\t\t"$(inherited)",
+\t\t\t\t\t"-lc++",
+\t\t\t\t\t"-lz",
+\t\t\t\t);
 \t\t\t\tTARGETED_DEVICE_FAMILY = 1;
 \t\t\t}};
 \t\t\tname = Release;
