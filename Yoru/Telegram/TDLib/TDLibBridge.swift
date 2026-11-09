@@ -42,24 +42,41 @@ public actor TDLibBridge {
     private var dynamicDestroy: TdJsonClientDestroy?
 
     public init() {
-        resolveDynamicSymbols()
+        let symbols = Self.resolveDynamicSymbols()
+        self.dynamicCreate = symbols.create
+        self.dynamicSend = symbols.send
+        self.dynamicReceive = symbols.receive
+        self.dynamicDestroy = symbols.destroy
     }
 
-    private func resolveDynamicSymbols() {
+    private nonisolated static func resolveDynamicSymbols() -> (
+        create: TdJsonClientCreate?,
+        send: TdJsonClientSend?,
+        receive: TdJsonClientReceive?,
+        destroy: TdJsonClientDestroy?
+    ) {
         #if canImport(Darwin)
         let handle = UnsafeMutableRawPointer(bitPattern: -2) // RTLD_DEFAULT
+        var fnCreatePtr: TdJsonClientCreate?
+        var fnSendPtr: TdJsonClientSend?
+        var fnReceivePtr: TdJsonClientReceive?
+        var fnDestroyPtr: TdJsonClientDestroy?
+
         if let fnCreate = dlsym(handle, "td_json_client_create") {
-            dynamicCreate = unsafeBitCast(fnCreate, to: TdJsonClientCreate.self)
+            fnCreatePtr = unsafeBitCast(fnCreate, to: TdJsonClientCreate.self)
         }
         if let fnSend = dlsym(handle, "td_json_client_send") {
-            dynamicSend = unsafeBitCast(fnSend, to: TdJsonClientSend.self)
+            fnSendPtr = unsafeBitCast(fnSend, to: TdJsonClientSend.self)
         }
         if let fnReceive = dlsym(handle, "td_json_client_receive") {
-            dynamicReceive = unsafeBitCast(fnReceive, to: TdJsonClientReceive.self)
+            fnReceivePtr = unsafeBitCast(fnReceive, to: TdJsonClientReceive.self)
         }
         if let fnDestroy = dlsym(handle, "td_json_client_destroy") {
-            dynamicDestroy = unsafeBitCast(fnDestroy, to: TdJsonClientDestroy.self)
+            fnDestroyPtr = unsafeBitCast(fnDestroy, to: TdJsonClientDestroy.self)
         }
+        return (fnCreatePtr, fnSendPtr, fnReceivePtr, fnDestroyPtr)
+        #else
+        return (nil, nil, nil, nil)
         #endif
     }
 

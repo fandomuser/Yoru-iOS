@@ -25,10 +25,10 @@ Yoru/Frameworks/*.zip
 build_tdlib/
 
 # TDLib Runtime Databases & Session Caches
-tdlib/
-tdlib_files/
-tdlib_test/
-tdlib_files_test/
+/tdlib/
+/tdlib_files/
+/tdlib_test/
+/tdlib_files_test/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm

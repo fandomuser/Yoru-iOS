@@ -1,5 +1,7 @@
 import Foundation
 import Combine
+import os
+import YoruCore
 
 public struct TDLibError: LocalizedError, Equatable {
     public let code: Int
@@ -15,14 +17,22 @@ public struct TDLibError: LocalizedError, Equatable {
     }
 }
 
+private struct QueryState {
+    var pending: [String: CheckedContinuation<[String: Any], Error>] = [:]
+}
+
+private struct CacheState {
+    var chats: [Int64: TelegramChat] = [:]
+    var users: [Int64: TelegramUser] = [:]
+}
+
 /// Production TDLib implementation conforming to TelegramClientProtocol.
 /// Connects directly to TDLib C JSON API with thread-safe query routing,
 /// cooperative cancellation, and full authorization/connection state handling.
 public final class TDLibJsonClient: TelegramClientProtocol {
     private let bridge: TDLibBridge
     private var receiveTask: Task<Void, Never>?
-    private var pendingQueries: [String: CheckedContinuation<[String: Any], Error>] = [:]
-    private let queryLock = NSLock()
+    private let queryState = OSAllocatedUnfairLock(initialState: QueryState())
 
     // Continuations for reactive streams
     private var authContinuation: AsyncStream<TelegramAuthState>.Continuation?
@@ -30,10 +40,8 @@ public final class TDLibJsonClient: TelegramClientProtocol {
     private var messageContinuation: AsyncStream<TelegramMessage>.Continuation?
 
     // Local caches updated via real TDLib event stream with thread-safe access
-    private var chatsCache: [Int64: TelegramChat] = [:]
-    private var usersCache: [Int64: TelegramUser] = [:]
+    private let cacheState = OSAllocatedUnfairLock(initialState: CacheState())
     private var currentMeUser: TelegramUser?
-    private let cacheLock = NSLock()
 
     // Stored initialization parameters for sequential TDLib state machine dispatch
     private var isParametersSent = false
@@ -122,13 +130,15 @@ public final class TDLibJsonClient: TelegramClientProtocol {
         receiveTask?.cancel()
         receiveTask = nil
 
-        // Cancel all pending queries safely under lock
-        queryLock.lock()
-        for (_, continuation) in pendingQueries {
+        // Cancel all pending queries safely under scoped lock
+        let pendingToCancel = queryState.withLock { state -> [CheckedContinuation<[String: Any], Error>] in
+            let list = Array(state.pending.values)
+            state.pending.removeAll()
+            return list
+        }
+        for continuation in pendingToCancel {
             continuation.resume(throwing: TDLibError(code: -1, message: "Client session closed"))
         }
-        pendingQueries.removeAll()
-        queryLock.unlock()
 
         await bridge.destroy()
         authContinuation?.finish()
@@ -158,9 +168,9 @@ public final class TDLibJsonClient: TelegramClientProtocol {
 
         // 1. Route @extra query responses
         if let extra = json["@extra"] as? String {
-            queryLock.lock()
-            let continuation = pendingQueries.removeValue(forKey: extra)
-            queryLock.unlock()
+            let continuation = queryState.withLock { state in
+                state.pending.removeValue(forKey: extra)
+            }
 
             if let continuation = continuation {
                 if type == "error" {
@@ -185,10 +195,10 @@ public final class TDLibJsonClient: TelegramClientProtocol {
         case "updateNewChat":
             if let chatObj = json["chat"] as? [String: Any],
                let chat = parseChat(chatObj) {
-                cacheLock.lock()
-                chatsCache[chat.id] = chat
-                let sortedChats = Array(chatsCache.values).sorted(by: { $0.isPinned && !$1.isPinned })
-                cacheLock.unlock()
+                let sortedChats = cacheState.withLock { state -> [TelegramChat] in
+                    state.chats[chat.id] = chat
+                    return Array(state.chats.values).sorted(by: { $0.isPinned && !$1.isPinned })
+                }
                 chatsContinuation?.yield(sortedChats)
             }
 
@@ -196,8 +206,8 @@ public final class TDLibJsonClient: TelegramClientProtocol {
             if let chatId = json["chat_id"] as? Int64,
                let lastMsgObj = json["last_message"] as? [String: Any],
                let lastMsg = parseMessage(lastMsgObj) {
-                cacheLock.lock()
-                if var chat = chatsCache[chatId] {
+                let sortedChats: [TelegramChat]? = cacheState.withLock { state in
+                    guard var chat = state.chats[chatId] else { return nil }
                     chat = TelegramChat(
                         id: chat.id,
                         title: chat.title,
@@ -213,12 +223,11 @@ public final class TDLibJsonClient: TelegramClientProtocol {
                         lastReadInboxMessageId: chat.lastReadInboxMessageId,
                         lastReadOutboxMessageId: chat.lastReadOutboxMessageId
                     )
-                    chatsCache[chatId] = chat
-                    let sortedChats = Array(chatsCache.values).sorted(by: { $0.isPinned && !$1.isPinned })
-                    cacheLock.unlock()
-                    chatsContinuation?.yield(sortedChats)
-                } else {
-                    cacheLock.unlock()
+                    state.chats[chatId] = chat
+                    return Array(state.chats.values).sorted(by: { $0.isPinned && !$1.isPinned })
+                }
+                if let sorted = sortedChats {
+                    chatsContinuation?.yield(sorted)
                 }
             }
 
@@ -231,32 +240,32 @@ public final class TDLibJsonClient: TelegramClientProtocol {
         case "updateUser":
             if let userObj = json["user"] as? [String: Any],
                let user = parseUser(userObj) {
-                cacheLock.lock()
-                usersCache[user.id] = user
-                cacheLock.unlock()
+                cacheState.withLock { state in
+                    state.users[user.id] = user
+                }
             }
 
         case "updateUserStatus":
             if let userId = json["user_id"] as? Int64,
                let statusObj = json["status"] as? [String: Any] {
-                cacheLock.lock()
-                if let user = usersCache[userId] {
-                    let updatedUser = TelegramUser(
-                        id: user.id,
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                        username: user.username,
-                        phoneNumber: user.phoneNumber,
-                        avatarUrl: user.avatarUrl,
-                        bio: user.bio,
-                        isVerified: user.isVerified,
-                        isPremium: user.isPremium,
-                        isBot: user.isBot,
-                        status: parseUserStatus(statusObj)
-                    )
-                    usersCache[userId] = updatedUser
+                cacheState.withLock { state in
+                    if let user = state.users[userId] {
+                        let updatedUser = TelegramUser(
+                            id: user.id,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            username: user.username,
+                            phoneNumber: user.phoneNumber,
+                            avatarUrl: user.avatarUrl,
+                            bio: user.bio,
+                            isVerified: user.isVerified,
+                            isPremium: user.isPremium,
+                            isBot: user.isBot,
+                            status: parseUserStatus(statusObj)
+                        )
+                        state.users[userId] = updatedUser
+                    }
                 }
-                cacheLock.unlock()
             }
 
         default:
@@ -359,17 +368,17 @@ public final class TDLibJsonClient: TelegramClientProtocol {
 
         return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { continuation in
-                queryLock.lock()
-                pendingQueries[extraId] = continuation
-                queryLock.unlock()
+                queryState.withLock { state in
+                    state.pending[extraId] = continuation
+                }
 
                 Task {
                     do {
                         try await bridge.send(request: jsonString)
                     } catch {
-                        queryLock.lock()
-                        let pending = pendingQueries.removeValue(forKey: extraId)
-                        queryLock.unlock()
+                        let pending = queryState.withLock { state in
+                            state.pending.removeValue(forKey: extraId)
+                        }
                         pending?.resume(throwing: error)
                     }
                 }
@@ -377,18 +386,18 @@ public final class TDLibJsonClient: TelegramClientProtocol {
                 if timeoutSeconds > 0 {
                     Task {
                         try? await Task.sleep(nanoseconds: UInt64(timeoutSeconds * 1_000_000_000))
-                        queryLock.lock()
-                        let pending = pendingQueries.removeValue(forKey: extraId)
-                        queryLock.unlock()
+                        let pending = queryState.withLock { state in
+                            state.pending.removeValue(forKey: extraId)
+                        }
                         let queryType = dict["@type"] as? String ?? "unknown"
                         pending?.resume(throwing: TDLibError(code: 408, message: "TDLib query '\(queryType)' timed out after \(timeoutSeconds)s"))
                     }
                 }
             }
         } onCancel: {
-            queryLock.lock()
-            let pending = pendingQueries.removeValue(forKey: extraId)
-            queryLock.unlock()
+            let pending = queryState.withLock { state in
+                state.pending.removeValue(forKey: extraId)
+            }
             pending?.resume(throwing: CancellationError())
         }
     }
@@ -439,9 +448,9 @@ public final class TDLibJsonClient: TelegramClientProtocol {
             ])
             if let chat = parseChat(chatResponse) {
                 loadedChats.append(chat)
-                cacheLock.lock()
-                chatsCache[chat.id] = chat
-                cacheLock.unlock()
+                cacheState.withLock { state in
+                    state.chats[chat.id] = chat
+                }
             }
         }
 
@@ -553,18 +562,15 @@ public final class TDLibJsonClient: TelegramClientProtocol {
     }
 
     public func getUser(userId: Int64) async throws -> TelegramUser {
-        cacheLock.lock()
-        if let cached = usersCache[userId] {
-            cacheLock.unlock()
+        if let cached = cacheState.withLock({ $0.users[userId] }) {
             return cached
         }
-        cacheLock.unlock()
 
         let response = try await executeQuery(["@type": "getUser", "user_id": userId])
         if let user = parseUser(response) {
-            cacheLock.lock()
-            usersCache[userId] = user
-            cacheLock.unlock()
+            cacheState.withLock { state in
+                state.users[userId] = user
+            }
             return user
         }
         throw TDLibError(code: -1, message: "Failed to parse TDLib getUser response")
