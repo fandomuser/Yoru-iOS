@@ -39,7 +39,7 @@ def main():
         file_ref_map[sf] = file_id
         
         build_files.append(f"\t\t{build_id} /* {base_name} in Sources */ = {{isa = PBXBuildFile; fileRef = {file_id} /* {base_name} */; }};")
-        file_refs.append(f"\t\t{file_id} /* {base_name} */ = {{isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = {base_name}; sourceTree = \"<group>\"; }};")
+        file_refs.append(f"\t\t{file_id} /* {base_name} */ = {{isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = \"{base_name}\"; sourceTree = \"<group>\"; }};")
         sources_entries.append(f"\t\t\t\t{build_id} /* {base_name} in Sources */,")
     
     # Non-code resources & Framework
@@ -106,7 +106,7 @@ def main():
 \t\t\tchildren = (
 {children_str}
 \t\t\t);
-\t\t\tpath = {name};
+\t\t\tpath = \"{name}\";
 \t\t\tsourceTree = "<group>";
 \t\t}};""")
 
