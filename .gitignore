@@ -1,0 +1,26 @@
+# Xcode & Apple Build Artifacts
+.DS_Store
+DerivedData/
+xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcuserdata
+*.mode1v3
+*.mode2v3
+*.moved-aside
+*.ipa
+*.app
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# TDLib Local Build Output
+build_tdlib/
+
+# Local Environment & Secrets
+# (Use Yoru/Resources/Config.xcconfig.template for committed defaults)
+.env
+.env.local

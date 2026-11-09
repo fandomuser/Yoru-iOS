@@ -1,0 +1,19 @@
+// Yoru — Build Configuration Template
+// Copy this file to Config.xcconfig and supply your official Telegram API credentials.
+// Obtain your credentials at https://my.telegram.org
+
+// Telegram API Client Credentials
+YORU_TELEGRAM_API_ID = 00000000
+YORU_TELEGRAM_API_HASH = "00000000000000000000000000000000"
+
+// Product Identity
+PRODUCT_BUNDLE_IDENTIFIER = com.yoru.client
+PRODUCT_NAME = Yoru
+MARKETING_VERSION = 0.1.0
+CURRENT_PROJECT_VERSION = 1
+
+// Target Platform
+TARGETED_DEVICE_FAMILY = 1 // iPhone
+IPHONEOS_DEPLOYMENT_TARGET = 17.0
+SWIFT_VERSION = 5.10
+ENABLE_USER_SCRIPT_SANDBOXING = YES
