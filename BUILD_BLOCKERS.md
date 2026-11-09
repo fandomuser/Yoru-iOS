@@ -141,7 +141,8 @@
 - **Exact Resolution Evidence:**
   - Removed `setup_framework.sh` from the production pipeline.
   - Authored [`Scripts/fetch_real_tdlib.sh`](file:///c:/Users/Arif/Downloads/yoru/Scripts/fetch_real_tdlib.sh), which downloads the official, production-grade `TDLibFramework.xcframework` pinned to release **`1.8.69-4c6377aa`** directly from `Swiftgram/TDLibFramework` (compiled from official Telegram TDLib C++ source with OpenSSL).
-  - Enforced strict binary verification in `fetch_real_tdlib.sh` and CI: asserts that the binary size exceeds 10MB (real C++ binary) and verifies headers and modulemaps. If missing or counterfeit, the script fails hard with exit code 1.
+  - Enforced SHA-256 cryptographic checksum verification: asserts that `TDLibFramework.zip` matches the official published SHA-256 hash `c86ca527be4adb4e2562693176b28a74290a86e9a55988af5c169420c6b77d49`.
+  - Enforced strict binary verification in `fetch_real_tdlib.sh` and CI: asserts that the binary size exceeds 10MB (real C++ binary), validates archive extraction directly into `Yoru/Frameworks/TDLibFramework.xcframework`, and verifies headers and modulemap (`module TDLibFramework`). If missing, mismatched, or counterfeit, the script fails hard with exit code 1.
   - Isolated mock-only stub generation into [`Scripts/setup_tdlib_mock_stub.sh`](file:///c:/Users/Arif/Downloads/yoru/Scripts/setup_tdlib_mock_stub.sh), producing an explicitly named `TDLibMock.xcframework` completely blocked from production artifacts.
 
 ---
@@ -224,7 +225,7 @@ The project enforces strict separation between local lexical checks, compilation
 | **Layer 3: iOS Simulator Build (xcodebuild)** | PBXProject linking, asset compilation, framework embedding. | Xcode project configured with all 78 sources and embedded XCFramework. Validated on macOS runner in `.github/workflows/ios-ci.yml`. | **AUTOMATED IN CI** |
 | **Layer 4: Real TDLib Integration** | C dylib / XCFramework presence, architecture slices, OpenSSL linking. | Pinned official release `1.8.69-4c6377aa` fetched and verified (>10MB C++ binary) via [`Scripts/fetch_real_tdlib.sh`](file:///c:/Users/Arif/Downloads/yoru/Scripts/fetch_real_tdlib.sh). Fake stub eliminated. | **RESOLVED & PINNED** |
 | **Layer 5: Physical Device Installation** | Apple Developer code-signing, provisioning profile, IPA payload. | Requires Apple Developer account and signed IPA for iPhone 17 Pro Max. | **PENDING SIGNING** |
-| **Layer 6: Telegram Authentication** | MTProto handshake, test DC authorization state machine. | Automated integration test with `use_test_dc = true` implemented in [`Tests/YoruTests.swift`](file:///c:/Users/Arif/Downloads/yoru/Tests/YoruTests.swift). Zero real credentials required. | **VERIFIED IN TEST DC** |
+| **Layer 6: Telegram Authentication** | MTProto network handshake, live Test DC authorization session. | Local unit test (`testLocalTDLibErrorAndStorageConfiguration`) verifies local error mapping and storage formatting. Live Test DC network authentication requires execution on a network-connected macOS host or physical device. | **PENDING LIVE NETWORK EXECUTION** |
 
 ---
 

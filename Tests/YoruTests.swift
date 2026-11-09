@@ -43,7 +43,9 @@ final class YoruTests: XCTestCase {
         }
     }
 
-    func testTDLibTestDCConfigurationAndErrorHandling() async {
+    /// Local unit test verifying error mapping, unlinked bridge fallback state, and Keychain encryption key formatting.
+    /// NOTE: This is an offline local unit test. It does NOT perform live network authorization against Telegram Test DC.
+    func testLocalTDLibErrorAndStorageConfiguration() async {
         // Validate that TDLibError maintains structured error codes and messages
         let error = TDLibError(code: 400, message: "PHONE_NUMBER_INVALID")
         XCTAssertEqual(error.code, 400)

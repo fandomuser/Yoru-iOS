@@ -13,14 +13,39 @@ xcuserdata/
 *.dSYM.zip
 *.dSYM
 
-# Swift Package Manager
+# Swift Package Manager & Caches
 .build/
 .swiftpm/
 
-# TDLib Local Build Output
+# TDLib Binary Frameworks & Archives (Always fetched via fetch_real_tdlib.sh)
+Yoru/Frameworks/*.xcframework
+Yoru/Frameworks/*.zip
+*.xcframework/
+*.framework/
 build_tdlib/
 
+# TDLib Runtime Databases & Session Caches
+tdlib/
+tdlib_files/
+tdlib_test/
+tdlib_files_test/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.bin
+*.log
+*.tdlib
+
+# Security, Signing Keys & Certificates
+*.p12
+*.cer
+*.mobileprovision
+*.provisionprofile
+*.key
+*.pem
+
 # Local Environment & Secrets
-# (Use Yoru/Resources/Config.xcconfig.template for committed defaults)
 .env
-.env.local
+.env.*
+*.local.xcconfig
+*.secret.xcconfig

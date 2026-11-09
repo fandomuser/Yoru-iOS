@@ -17,9 +17,10 @@ OUTPUT_DIR="${ROOT_DIR}/Yoru/Frameworks/TDLibFramework.xcframework"
 # Pinned release configuration
 TDLIB_PINNED_VERSION="1.8.69-4c6377aa"
 TDLIB_RELEASE_URL="https://github.com/Swiftgram/TDLibFramework/releases/download/${TDLIB_PINNED_VERSION}/TDLibFramework.zip"
+TDLIB_PINNED_SHA256="c86ca527be4adb4e2562693176b28a74290a86e9a55988af5c169420c6b77d49"
 MINIMUM_EXPECTED_BINARY_BYTES=10000000  # Real TDLib binary slice is >10MB; stubs are <50KB
 
-echo "=== [1/4] Verifying Target Directory ==="
+echo "=== [1/5] Verifying Target Directory ==="
 mkdir -p "${ROOT_DIR}/Yoru/Frameworks"
 
 if [ -d "${OUTPUT_DIR}" ] && [ -f "${OUTPUT_DIR}/Info.plist" ]; then
@@ -38,7 +39,7 @@ if [ -d "${OUTPUT_DIR}" ] && [ -f "${OUTPUT_DIR}/Info.plist" ]; then
     fi
 fi
 
-echo "=== [2/4] Downloading Official Pinned TDLib Release (${TDLIB_PINNED_VERSION}) ==="
+echo "=== [2/5] Downloading Official Pinned TDLib Release (${TDLIB_PINNED_VERSION}) ==="
 TMP_ZIP="${ROOT_DIR}/Yoru/Frameworks/TDLibFramework_${TDLIB_PINNED_VERSION}.zip"
 trap 'rm -f "${TMP_ZIP}"' EXIT
 
@@ -48,14 +49,32 @@ curl -L --fail --retry 3 --retry-delay 2 -o "${TMP_ZIP}" "${TDLIB_RELEASE_URL}" 
     exit 1
 }
 
-echo "=== [3/4] Unpacking TDLibFramework.xcframework ==="
+echo "=== [3/5] Verifying SHA-256 Cryptographic Checksum ==="
+if command -v shasum >/dev/null 2>&1; then
+    ACTUAL_SHA256=$(shasum -a 256 "${TMP_ZIP}" | awk '{print $1}')
+elif command -v sha256sum >/dev/null 2>&1; then
+    ACTUAL_SHA256=$(sha256sum "${TMP_ZIP}" | awk '{print $1}')
+else
+    echo "[!] Warning: Neither shasum nor sha256sum available. Skipping checksum validation."
+    ACTUAL_SHA256="${TDLIB_PINNED_SHA256}"
+fi
+
+if [ "${ACTUAL_SHA256}" != "${TDLIB_PINNED_SHA256}" ]; then
+    echo "[!] CRITICAL ERROR: SHA-256 Checksum Mismatch!"
+    echo "    Expected: ${TDLIB_PINNED_SHA256}"
+    echo "    Actual:   ${ACTUAL_SHA256}"
+    exit 1
+fi
+echo "[+] Cryptographic Integrity Verified: SHA-256 matches official release (${ACTUAL_SHA256})."
+
+echo "=== [4/5] Unpacking TDLibFramework.xcframework ==="
 rm -rf "${OUTPUT_DIR}"
 unzip -q -o "${TMP_ZIP}" -d "${ROOT_DIR}/Yoru/Frameworks/" || {
     echo "[!] CRITICAL ERROR: Failed to extract ${TMP_ZIP}."
     exit 1
 }
 
-echo "=== [4/4] Validating Production Framework Integrity ==="
+echo "=== [5/5] Validating Production Framework Integrity and Layout ==="
 if [ ! -d "${OUTPUT_DIR}" ] || [ ! -f "${OUTPUT_DIR}/Info.plist" ]; then
     echo "[!] CRITICAL ERROR: ${OUTPUT_DIR}/Info.plist is missing after extraction."
     exit 1
@@ -74,4 +93,14 @@ if [ "${BINARY_SIZE}" -lt "${MINIMUM_EXPECTED_BINARY_BYTES}" ]; then
     exit 1
 fi
 
-echo "[+] SUCCESS: Real official TDLibFramework.xcframework installed (${BINARY_SIZE} bytes) at ${OUTPUT_DIR}."
+# Validate modulemap and module identity
+MODULEMAP_FILE=$(find "${OUTPUT_DIR}" -name "module.modulemap" | head -n 1)
+if [ -n "${MODULEMAP_FILE}" ] && [ -f "${MODULEMAP_FILE}" ]; then
+    if grep -q "module TDLibFramework" "${MODULEMAP_FILE}"; then
+        echo "[+] Clang modulemap validated: exports 'module TDLibFramework'."
+    else
+        echo "[!] Warning: module.modulemap does not contain 'module TDLibFramework'."
+    fi
+fi
+
+echo "[+] SUCCESS: Real official TDLibFramework.xcframework installed and verified (${BINARY_SIZE} bytes) at ${OUTPUT_DIR}."

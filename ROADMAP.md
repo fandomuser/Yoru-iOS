@@ -78,10 +78,10 @@ Architecture: **SwiftUI + Swift Concurrency + TDLib Protocol Bridge**
 - [x] TDLib 1.8.x event-driven state machine (`authorizationStateWaitTdlibParameters` -> `setTdlibParameters` -> `authorizationStateWaitEncryptionKey` -> `checkDatabaseEncryptionKey` -> `authorizationStateWaitPhoneNumber`).
 - [x] Database encryption API compatibility using `checkDatabaseEncryptionKey` with Keychain-derived key.
 - [x] `TDLibFramework.xcframework` integration into `Yoru.xcodeproj` (`PBXFrameworksBuildPhase` and `Embed Frameworks`).
-- [x] Authentic, production-grade TDLib binary fetch script (`Scripts/fetch_real_tdlib.sh`) pinned to official release `1.8.69-4c6377aa` (>10MB C++ engine with OpenSSL).
-- [x] Automated Telegram Test DC integration test support (`use_test_dc: true` in `Tests/YoruTests.swift`).
+- [x] Authentic, production-grade TDLib binary fetch script (`Scripts/fetch_real_tdlib.sh`) pinned to official release `1.8.69-4c6377aa` with SHA-256 validation.
+- [x] Offline local unit test for TDLib error mapping and storage formatting ([`Tests/YoruTests.swift`](file:///c:/Users/Arif/Downloads/yoru/Tests/YoruTests.swift)).
 - [ ] Connect full production compiled TDLib XCFramework on macOS build machine.
-- [ ] Verify production auth loop against Telegram test servers (DC 2 / DC 5).
+- [ ] Verify live auth loop over network against Telegram test servers (DC 2 / DC 5).
 
 ### Phase 5: Yoru Labs & Advanced Client Extensions (AyuGram Engine)
 - [x] Comprehensive Swift Source Code Audit ([`AUDIT.md`](file:///c:/Users/Arif/Downloads/yoru/AUDIT.md)).
