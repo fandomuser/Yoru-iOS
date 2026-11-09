@@ -47,5 +47,6 @@ tdlib_files_test/
 # Local Environment & Secrets
 .env
 .env.*
+Yoru/Resources/Config.xcconfig
 *.local.xcconfig
 *.secret.xcconfig

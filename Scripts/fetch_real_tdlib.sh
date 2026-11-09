@@ -19,23 +19,24 @@ TDLIB_PINNED_VERSION="1.8.69-4c6377aa"
 TDLIB_RELEASE_URL="https://github.com/Swiftgram/TDLibFramework/releases/download/${TDLIB_PINNED_VERSION}/TDLibFramework.zip"
 TDLIB_PINNED_SHA256="c86ca527be4adb4e2562693176b28a74290a86e9a55988af5c169420c6b77d49"
 MINIMUM_EXPECTED_BINARY_BYTES=10000000  # Real TDLib binary slice is >10MB; stubs are <50KB
+PROVENANCE_RECEIPT="${OUTPUT_DIR}/.provenance_receipt"
 
-echo "=== [1/5] Verifying Target Directory ==="
+echo "=== [1/5] Verifying Target Directory & Cryptographic Provenance ==="
 mkdir -p "${ROOT_DIR}/Yoru/Frameworks"
 
-if [ -d "${OUTPUT_DIR}" ] && [ -f "${OUTPUT_DIR}/Info.plist" ]; then
-    echo "[*] TDLibFramework.xcframework directory found. Checking binary authenticity..."
-    # Verify binary size
-    REAL_BINARY=$(find "${OUTPUT_DIR}" -name "TDLibFramework" -o -name "libtdjson.dylib" | head -n 1)
-    if [ -n "${REAL_BINARY}" ] && [ -f "${REAL_BINARY}" ]; then
-        SIZE=$(wc -c < "${REAL_BINARY}" | tr -d ' ')
-        if [ "${SIZE}" -ge "${MINIMUM_EXPECTED_BINARY_BYTES}" ]; then
-            echo "[+] Real TDLib binary verified (${SIZE} bytes at ${REAL_BINARY})."
-            exit 0
-        else
-            echo "[!] Existing framework is a mock or stub (${SIZE} bytes < ${MINIMUM_EXPECTED_BINARY_BYTES} bytes). Replacing with real TDLib..."
-            rm -rf "${OUTPUT_DIR}"
-        fi
+if [ -d "${OUTPUT_DIR}" ] && [ -f "${OUTPUT_DIR}/Info.plist" ] && [ -f "${PROVENANCE_RECEIPT}" ]; then
+    RECORDED_HASH=$(cat "${PROVENANCE_RECEIPT}" | tr -d ' \n\r')
+    if [ "${RECORDED_HASH}" = "${TDLIB_PINNED_SHA256}" ]; then
+        echo "[+] TDLibFramework.xcframework with verified cryptographic provenance (${RECORDED_HASH}) is already installed."
+        exit 0
+    else
+        echo "[!] Existing framework provenance hash mismatch (${RECORDED_HASH} != ${TDLIB_PINNED_SHA256}). Re-downloading..."
+        rm -rf "${OUTPUT_DIR}"
+    fi
+else
+    if [ -d "${OUTPUT_DIR}" ]; then
+        echo "[!] Existing framework lacks verified cryptographic provenance receipt. Re-downloading and validating pinned release..."
+        rm -rf "${OUTPUT_DIR}"
     fi
 fi
 
@@ -55,8 +56,9 @@ if command -v shasum >/dev/null 2>&1; then
 elif command -v sha256sum >/dev/null 2>&1; then
     ACTUAL_SHA256=$(sha256sum "${TMP_ZIP}" | awk '{print $1}')
 else
-    echo "[!] Warning: Neither shasum nor sha256sum available. Skipping checksum validation."
-    ACTUAL_SHA256="${TDLIB_PINNED_SHA256}"
+    echo "[!] CRITICAL ERROR: Neither shasum nor sha256sum is available on this system."
+    echo "[!] Cannot cryptographically verify the integrity of the downloaded TDLib archive."
+    exit 1
 fi
 
 if [ "${ACTUAL_SHA256}" != "${TDLIB_PINNED_SHA256}" ]; then
@@ -102,5 +104,9 @@ if [ -n "${MODULEMAP_FILE}" ] && [ -f "${MODULEMAP_FILE}" ]; then
         echo "[!] Warning: module.modulemap does not contain 'module TDLibFramework'."
     fi
 fi
+
+# Write cryptographic provenance receipt into extracted framework
+echo "${TDLIB_PINNED_SHA256}" > "${PROVENANCE_RECEIPT}"
+echo "[+] Cryptographic provenance receipt recorded at ${PROVENANCE_RECEIPT}."
 
 echo "[+] SUCCESS: Real official TDLibFramework.xcframework installed and verified (${BINARY_SIZE} bytes) at ${OUTPUT_DIR}."
