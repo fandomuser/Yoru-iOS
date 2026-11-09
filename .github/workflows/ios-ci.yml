@@ -79,6 +79,7 @@ jobs:
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 120 swift_test.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
+            python3 Scripts/emit_ci_error.py swift_test.log
             exit $STATUS
           }
           echo "### Swift Package Tests Passed Successfully" >> $GITHUB_STEP_SUMMARY
@@ -114,15 +115,7 @@ jobs:
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 120 xcodebuild.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            python3 -c "
-import sys
-try:
-    with open('xcodebuild.log') as f:
-        for l in [x.strip() for x in f if x.strip()][-25:]:
-            print('::error::' + l)
-except Exception:
-    pass
-"
+            python3 Scripts/emit_ci_error.py xcodebuild.log
             exit $STATUS
           }
           echo "### Xcode Build Succeeded Successfully" >> $GITHUB_STEP_SUMMARY
