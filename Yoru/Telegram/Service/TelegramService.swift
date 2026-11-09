@@ -12,7 +12,7 @@ public enum TelegramServiceMode {
 @Observable
 public final class TelegramService {
     // Production instance by default — connects to real TDLib network stack
-    public static let shared = TelegramService(mode: .production)
+    public static var shared = TelegramService(mode: .production)
 
     // Preview instance explicitly for SwiftUI Canvas and deterministic offline dev
     public static let preview = TelegramService(mode: .preview)

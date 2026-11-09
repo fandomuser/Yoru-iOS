@@ -123,7 +123,12 @@ jobs:
           }
           echo "### Xcode Build Succeeded Successfully" >> $GITHUB_STEP_SUMMARY
 
-      - name: Publish Logs as Public Release Asset
+      - name: Capture iOS Simulator Screenshots & Navigation Walkthrough
+        run: |
+          chmod +x Scripts/automate_simulator_screenshots.sh
+          ./Scripts/automate_simulator_screenshots.sh
+
+      - name: Publish Logs and Visual Artifacts as Public Release Asset
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -132,13 +137,23 @@ jobs:
             xcode_info.log \
             xcodebuild.log \
             swift_test.log \
-            --title "CI Logs" \
-            --notes "Automated CI logs for inspection" || \
+            artifacts/screenshots/* \
+            --title "CI Logs & Visual Validation" \
+            --notes "Automated CI logs and Simulator screenshots" || \
           gh release upload ci-logs \
             xcode_info.log \
             xcodebuild.log \
             swift_test.log \
+            artifacts/screenshots/* \
             --clobber || true
+
+      - name: Upload Visual Validation Screenshots and Videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulator-screenshots
+          path: artifacts/screenshots/
+          if-no-files-found: ignore
 
       - name: Upload Build and Test Logs
         if: always()

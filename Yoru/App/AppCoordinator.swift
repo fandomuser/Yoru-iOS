@@ -3,7 +3,7 @@ import SwiftUI
 public struct AppCoordinatorView: View {
     @Environment(\.yoruTheme) private var theme
     @State private var appState = AppState.shared
-    private let telegramService = TelegramService.shared
+    private var telegramService: TelegramService { TelegramService.shared }
     private let labs = YoruLabsManager.shared
 
     @State private var authViewModel = AuthViewModel()
