@@ -84,7 +84,7 @@ jobs:
           }
           echo "### Swift Package Tests Passed Successfully" >> $GITHUB_STEP_SUMMARY
 
-      - name: Validate Xcode Project Build for iOS Simulator
+      - name: Validate Xcode Project Build
         run: |
           set -o pipefail
           echo "=== Inspecting Xcode Schemes & Targets ==="
@@ -93,19 +93,11 @@ jobs:
           echo "=== Discovering Available Build Destinations ==="
           xcodebuild -showdestinations -project Yoru.xcodeproj -scheme Yoru || true
 
-          # Identify available iPhone simulator or fall back to generic iOS platform
-          SIM_NAME=$(xcrun simctl list devices available | grep -E "iPhone (15|16|14)" | head -n 1 | sed -E 's/^[[:space:]]+//' | sed -E 's/ \(.*//')
-          if [ -n "$SIM_NAME" ]; then
-            DEST="platform=iOS Simulator,name=$SIM_NAME"
-          else
-            DEST="generic/platform=iOS"
-          fi
-          echo "=== Selected Destination: $DEST ==="
-
+          echo "=== Executing Xcode Build for Generic iOS Device ==="
           xcodebuild build \
             -project Yoru.xcodeproj \
             -scheme Yoru \
-            -destination "$DEST" \
+            -destination "generic/platform=iOS" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
