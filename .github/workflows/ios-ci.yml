@@ -119,16 +119,8 @@ jobs:
       - name: Emit Diagnostics as Warnings
         if: always()
         run: |
-          if [ -f xcode_info.log ]; then
-            cat xcode_info.log | head -n 25 | while IFS= read -r line; do
-              [ -n "$line" ] && echo "::warning title=XcodeInfo::$line"
-            done
-          fi
-          if [ -f xcodebuild.log ]; then
-            cat xcodebuild.log | tail -n 30 | while IFS= read -r line; do
-              [ -n "$line" ] && echo "::warning title=XcodeBuildLog::$line"
-            done
-          fi
+          python3 Scripts/print_diagnostics.py xcode_info.log "XcodeInfo" 40 tail
+          python3 Scripts/print_diagnostics.py xcodebuild.log "XcodeBuild" 50 tail
 
       - name: Upload Build and Test Logs
         if: always()
