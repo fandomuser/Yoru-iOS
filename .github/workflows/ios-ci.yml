@@ -128,15 +128,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release delete ci-logs --yes || true
-          git tag -d ci-logs || true
-          git push --delete origin ci-logs || true
           gh release create ci-logs \
             xcode_info.log \
             xcodebuild.log \
             swift_test.log \
             --title "CI Logs" \
-            --notes "Automated CI logs for inspection" || true
+            --notes "Automated CI logs for inspection" || \
+          gh release upload ci-logs \
+            xcode_info.log \
+            xcodebuild.log \
+            swift_test.log \
+            --clobber || true
 
       - name: Upload Build and Test Logs
         if: always()

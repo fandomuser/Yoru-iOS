@@ -169,7 +169,6 @@ def main():
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
 \t\t\t\t{yoru_main_group_id} /* Yoru */,
-\t\t\t\t{fw_group_id} /* Frameworks */,
 \t\t\t\t{products_group_id} /* Products */,
 \t\t\t);
 \t\t\tsourceTree = "<group>";

@@ -1,7 +1,9 @@
 import Foundation
 import Combine
 import os
+#if canImport(YoruCore)
 import YoruCore
+#endif
 
 public struct TDLibError: LocalizedError, Equatable {
     public let code: Int
