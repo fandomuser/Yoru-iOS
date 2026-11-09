@@ -324,6 +324,8 @@ def main():
 \t\t\t\tMTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 \t\t\t\tONLY_ACTIVE_ARCH = YES;
 \t\t\t\tSDKROOT = iphoneos;
+\t\t\t\tSUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+\t\t\t\tSUPPORTS_MACCATALYST = NO;
 \t\t\t\tSWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 \t\t\t\tSWIFT_OPTIMIZATION_LEVEL = "-Onone";
 \t\t\t\tSWIFT_VERSION = 5.0;
@@ -344,6 +346,8 @@ def main():
 \t\t\t\tIPHONEOS_DEPLOYMENT_TARGET = 17.0;
 \t\t\t\tMTL_ENABLE_DEBUG_INFO = NO;
 \t\t\t\tSDKROOT = iphoneos;
+\t\t\t\tSUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+\t\t\t\tSUPPORTS_MACCATALYST = NO;
 \t\t\t\tSWIFT_COMPILATION_MODE = wholemodule;
 \t\t\t\tSWIFT_OPTIMIZATION_LEVEL = "-O";
 \t\t\t\tSWIFT_VERSION = 5.0;
@@ -372,6 +376,8 @@ def main():
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.yoru.client;
 \t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";
 \t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;\n\t\t\t\tSWIFT_VERSION = 5.0;
+\t\t\t\tSUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+\t\t\t\tSUPPORTS_MACCATALYST = NO;
 \t\t\t\tTARGETED_DEVICE_FAMILY = 1;
 \t\t\t}};
 \t\t\tname = Debug;
@@ -397,6 +403,8 @@ def main():
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.yoru.client;
 \t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";
 \t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;\n\t\t\t\tSWIFT_VERSION = 5.0;
+\t\t\t\tSUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+\t\t\t\tSUPPORTS_MACCATALYST = NO;
 \t\t\t\tTARGETED_DEVICE_FAMILY = 1;
 \t\t\t}};
 \t\t\tname = Release;

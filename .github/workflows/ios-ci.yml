@@ -7,6 +7,11 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  checks: write
+  actions: read
+
 jobs:
   build-and-test:
     name: Build & Test Yoru iOS Client
@@ -112,15 +117,26 @@ jobs:
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 120 xcodebuild.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "=== XCODEBUILD FAILURE LOG (LAST 120 LINES) ==="
+            tail -n 120 xcodebuild.log
             exit $STATUS
           }
           echo "### Xcode Build Succeeded Successfully" >> $GITHUB_STEP_SUMMARY
 
-      - name: Emit Diagnostics as Warnings
+      - name: Publish Logs as Public Release Asset
         if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 Scripts/print_diagnostics.py xcode_info.log "XcodeInfo" 40 tail
-          python3 Scripts/print_diagnostics.py xcodebuild.log "XcodeBuild" 50 tail
+          gh release delete ci-logs --yes || true
+          git tag -d ci-logs || true
+          git push --delete origin ci-logs || true
+          gh release create ci-logs \
+            xcode_info.log \
+            xcodebuild.log \
+            swift_test.log \
+            --title "CI Logs" \
+            --notes "Automated CI logs for inspection" || true
 
       - name: Upload Build and Test Logs
         if: always()
