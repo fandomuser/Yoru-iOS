@@ -1,7 +1,7 @@
 import Foundation
 
 public extension Date {
-    func yoruChatTimestamp() -> String {
+    public func yoruChatTimestamp() -> String {
         let calendar = Calendar.current
         if calendar.isDateInToday(self) {
             let formatter = DateFormatter()
@@ -16,7 +16,7 @@ public extension Date {
         }
     }
 
-    func yoruMessageTime() -> String {
+    public func yoruMessageTime() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: self)

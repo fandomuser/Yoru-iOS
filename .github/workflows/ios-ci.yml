@@ -72,10 +72,20 @@ jobs:
 
       - name: Run Swift Package Unit Tests
         run: |
-          swift test -v
+          set -o pipefail
+          swift test -v 2>&1 | tee swift_test.log || {
+            STATUS=$?
+            echo "### Swift Package Tests Failed (Exit $STATUS)" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 120 swift_test.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit $STATUS
+          }
+          echo "### Swift Package Tests Passed Successfully" >> $GITHUB_STEP_SUMMARY
 
       - name: Validate Xcode Project Build for iOS Simulator
         run: |
+          set -o pipefail
           xcodebuild build \
             -project Yoru.xcodeproj \
             -scheme Yoru \
@@ -83,4 +93,22 @@ jobs:
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            ONLY_ACTIVE_ARCH=NO
+            ONLY_ACTIVE_ARCH=NO 2>&1 | tee xcodebuild.log || {
+            STATUS=$?
+            echo "### Xcode Simulator Build Failed (Exit $STATUS)" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 120 xcodebuild.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit $STATUS
+          }
+          echo "### Xcode Simulator Build Succeeded Successfully" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Build and Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-and-test-logs
+          path: |
+            swift_test.log
+            xcodebuild.log
+          if-no-files-found: ignore

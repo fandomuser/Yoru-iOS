@@ -48,7 +48,7 @@ public struct CyberBorderModifier: ViewModifier {
 }
 
 public extension View {
-    func yoruCyberBorder(cornerCut: CGFloat = 12, strokeColor: Color = Color.cyan, lineWidth: CGFloat = 1.5) -> some View {
+    public func yoruCyberBorder(cornerCut: CGFloat = 12, strokeColor: Color = Color.cyan, lineWidth: CGFloat = 1.5) -> some View {
         modifier(CyberBorderModifier(cornerCut: cornerCut, strokeColor: strokeColor, lineWidth: lineWidth))
     }
 }

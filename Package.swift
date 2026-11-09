@@ -14,8 +14,8 @@ let package = Package(
             targets: ["YoruCore"]
         ),
         .library(
-            name: "YoruUI",
-            targets: ["YoruUI"]
+            name: "YoruTelegram",
+            targets: ["YoruTelegram"]
         )
     ],
     dependencies: [],
@@ -29,19 +29,9 @@ let package = Package(
             dependencies: ["YoruCore"],
             path: "Yoru/Telegram"
         ),
-        .target(
-            name: "YoruComponents",
-            dependencies: ["YoruCore", "YoruTelegram"],
-            path: "Yoru/Components"
-        ),
-        .target(
-            name: "YoruUI",
-            dependencies: ["YoruCore", "YoruTelegram", "YoruComponents"],
-            path: "Yoru/Features"
-        ),
         .testTarget(
             name: "YoruTests",
-            dependencies: ["YoruCore", "YoruTelegram", "YoruComponents"],
+            dependencies: ["YoruCore", "YoruTelegram"],
             path: "Tests"
         )
     ]

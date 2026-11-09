@@ -51,12 +51,12 @@ public final class ThemeManager {
 }
 
 // SwiftUI Environment Key
-private struct YoruThemeKey: EnvironmentKey {
-    static let defaultValue: YoruTheme = YoruThemes.tokyoNight
+public struct YoruThemeKey: EnvironmentKey {
+    public static let defaultValue: YoruTheme = YoruThemes.tokyoNight
 }
 
 public extension EnvironmentValues {
-    var yoruTheme: YoruTheme {
+    public var yoruTheme: YoruTheme {
         get { self[YoruThemeKey.self] }
         set { self[YoruThemeKey.self] = newValue }
     }

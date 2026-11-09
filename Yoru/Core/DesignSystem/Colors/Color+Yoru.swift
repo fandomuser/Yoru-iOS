@@ -5,7 +5,7 @@ import UIKit
 #endif
 
 public extension Color {
-    init(hex: String) {
+    public init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0
         Scanner(string: hex).scanHexInt64(&int)
@@ -30,7 +30,7 @@ public extension Color {
         )
     }
 
-    func toHex() -> String {
+    public func toHex() -> String {
         #if canImport(UIKit)
         let uic = UIColor(self)
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0

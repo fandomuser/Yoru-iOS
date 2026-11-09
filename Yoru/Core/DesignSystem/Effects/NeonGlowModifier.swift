@@ -23,7 +23,7 @@ public struct NeonGlowModifier: ViewModifier {
 }
 
 public extension View {
-    func yoruNeonGlow(color: Color, radius: CGFloat = 8, isActive: Bool = true) -> some View {
+    public func yoruNeonGlow(color: Color, radius: CGFloat = 8, isActive: Bool = true) -> some View {
         modifier(NeonGlowModifier(color: color, radius: radius, isActive: isActive))
     }
 }

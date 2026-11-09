@@ -50,7 +50,7 @@ public struct GlassmorphicModifier: ViewModifier {
 }
 
 public extension View {
-    func yoruGlassmorphic(
+    public func yoruGlassmorphic(
         cornerRadius: CGFloat = 16,
         surfaceColor: Color = Color(hex: "#1A1D2E"),
         opacity: Double = 0.7,
