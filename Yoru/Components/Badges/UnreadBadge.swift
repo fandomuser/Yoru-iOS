@@ -16,7 +16,8 @@ public struct UnreadBadge: View {
                 .font(.yoruCyberBadge)
                 .foregroundColor(isMuted ? theme.textSecondary : theme.textInverse)
                 .padding(.horizontal, 6)
-                .frame(minWidth: 20, height: 20)
+                .frame(minWidth: 20)
+                .frame(height: 20)
                 .background(
                     Capsule()
                         .fill(isMuted ? theme.backgroundElevated : theme.accentPrimary)
