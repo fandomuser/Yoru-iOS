@@ -202,12 +202,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1A452709C6AFEEEBDD81111E /* Colors */ = {
+		1A9C19D971A9830969D34ADA /* Theme */ = {
 			isa = PBXGroup;
 			children = (
-				1A41C674672916C052D3870C /* Color+Yoru.swift */,
+				1AAC1D073A3FD39D5E80FF27 /* ThemeManager.swift */,
+				1A58CF50B898F23D3A29A669 /* Themes.swift */,
+				1AFC6448343E83BDEC8AF1A8 /* YoruTheme.swift */,
 			);
-			path = Colors;
+			path = Theme;
 			sourceTree = "<group>";
 		};
 		1ABAD6DF44EE04467385B528 /* Motion */ = {
@@ -218,14 +220,12 @@
 			path = Motion;
 			sourceTree = "<group>";
 		};
-		1A9C19D971A9830969D34ADA /* Theme */ = {
+		1A452709C6AFEEEBDD81111E /* Colors */ = {
 			isa = PBXGroup;
 			children = (
-				1AAC1D073A3FD39D5E80FF27 /* ThemeManager.swift */,
-				1A58CF50B898F23D3A29A669 /* Themes.swift */,
-				1AFC6448343E83BDEC8AF1A8 /* YoruTheme.swift */,
+				1A41C674672916C052D3870C /* Color+Yoru.swift */,
 			);
-			path = Theme;
+			path = Colors;
 			sourceTree = "<group>";
 		};
 		1AFB63534E7E95CDAF0A69AF /* Effects */ = {
@@ -246,15 +246,6 @@
 			path = Typography;
 			sourceTree = "<group>";
 		};
-		1A345CB705B0054BA81ACDB0 /* Profiles */ = {
-			isa = PBXGroup;
-			children = (
-				1A94A9BCE5675957BB164B71 /* ProfileViewModel.swift */,
-				1AFBB1BF24CBAE54E78B1135 /* UserProfileView.swift */,
-			);
-			path = Profiles;
-			sourceTree = "<group>";
-		};
 		1A67C6786408D05BD6552019 /* Search */ = {
 			isa = PBXGroup;
 			children = (
@@ -262,123 +253,6 @@
 				1AF6018FDE13CCF472C777BF /* SearchViewModel.swift */,
 			);
 			path = Search;
-			sourceTree = "<group>";
-		};
-		1A888B54E6A05D73C9C9C635 /* Labs */ = {
-			isa = PBXGroup;
-			children = (
-				1A025F217C10B15A40D5D3A7 /* BiometricAuthService.swift */,
-				1A3C46AF7F273A6E99DD9FF6 /* MessageFilterEngine.swift */,
-				1A8A2EA3C26DB57010940805 /* MessageHistoryVault.swift */,
-				1A480D1B68F2A0F2F6200998 /* YoruLabsManager.swift */,
-				1AA763A08C1A2314CD8E86E0 /* YoruLabsSettings.swift */,
-				1A88B206D8838E70A0632FBA /* YoruLabsStore.swift */,
-			);
-			path = Labs;
-			sourceTree = "<group>";
-		};
-		1AC1974A2C6AA30BC2456431 /* Mock */ = {
-			isa = PBXGroup;
-			children = (
-				1A5DBCF9A4F8EB96D7CAB587 /* MockDataGenerator.swift */,
-				1AD10847D325D521A83649F3 /* MockTelegramClient.swift */,
-			);
-			path = Mock;
-			sourceTree = "<group>";
-		};
-		1A909911ED58F981BD48B26E /* Service */ = {
-			isa = PBXGroup;
-			children = (
-				1A7D85FCA5C19DB01571B5FE /* TelegramClientProtocol.swift */,
-				1A670956E4B405022CFCAE58 /* TelegramService.swift */,
-			);
-			path = Service;
-			sourceTree = "<group>";
-		};
-		1A9F350D0217F2BC84F40252 /* DesignSystem */ = {
-			isa = PBXGroup;
-			children = (
-				1A452709C6AFEEEBDD81111E /* Colors */,
-				1AFB63534E7E95CDAF0A69AF /* Effects */,
-				1ABAD6DF44EE04467385B528 /* Motion */,
-				1A9C19D971A9830969D34ADA /* Theme */,
-				1A90A0E6855DFCD4040F245B /* Typography */,
-			);
-			path = DesignSystem;
-			sourceTree = "<group>";
-		};
-		1A624DA6A3A0FAB7B10E519A /* Contacts */ = {
-			isa = PBXGroup;
-			children = (
-				1AA33AFF3687F6B8B6E149FF /* ContactsView.swift */,
-				1A9696DE4EC9C222D7089A5D /* ContactsViewModel.swift */,
-			);
-			path = Contacts;
-			sourceTree = "<group>";
-		};
-		1ABD37F29BA8861322FCF12B /* Bubbles */ = {
-			isa = PBXGroup;
-			children = (
-				1A28E7B1EC6B2B390421FE51 /* MessageBubbleView.swift */,
-			);
-			path = Bubbles;
-			sourceTree = "<group>";
-		};
-		1AB8D15FD0D7F4CDF5F44163 /* Conversation */ = {
-			isa = PBXGroup;
-			children = (
-				1AA6A9E30ED08936D857375A /* ConversationHeaderView.swift */,
-				1A622D9580D68BC197C0D070 /* ConversationView.swift */,
-				1AD40159229F9B862150F234 /* ConversationViewModel.swift */,
-				1A78FC05403E8FFB40C29311 /* MessageListView.swift */,
-			);
-			path = Conversation;
-			sourceTree = "<group>";
-		};
-		1A022D1C8B6AD404BEECED8C /* Cards */ = {
-			isa = PBXGroup;
-			children = (
-				1A0FCB644E586625AAB1BC62 /* CyberCard.swift */,
-				1AFDAA3C86033FA5D88A3DED /* ProfileCard.swift */,
-			);
-			path = Cards;
-			sourceTree = "<group>";
-		};
-		1A2722CF3C745C7A874827DA /* Buttons */ = {
-			isa = PBXGroup;
-			children = (
-				1AF439BDC5C10BAF5644D2B3 /* CyberIconButton.swift */,
-				1AFDCD7F9E703CA9AEE12A03 /* YoruButton.swift */,
-			);
-			path = Buttons;
-			sourceTree = "<group>";
-		};
-		1A842D71C63479D2DFD941CE /* Chats */ = {
-			isa = PBXGroup;
-			children = (
-				1A431EE9C8A64713C818AF48 /* ChatFolderBar.swift */,
-				1A5AB627AC14AAA8F910CDD1 /* ChatListView.swift */,
-				1AFA7384A02D6B04DA25FF87 /* ChatListViewModel.swift */,
-				1A591A43ADFCF2F87843E6FC /* ChatRowView.swift */,
-			);
-			path = Chats;
-			sourceTree = "<group>";
-		};
-		1A516A7D41BA144F6BFC16D1 /* TabBar */ = {
-			isa = PBXGroup;
-			children = (
-				1AF6CF484DBC4D65C72D902C /* CustomTabBar.swift */,
-			);
-			path = TabBar;
-			sourceTree = "<group>";
-		};
-		1AC17587865C5280FD24261F /* Security */ = {
-			isa = PBXGroup;
-			children = (
-				1AAEBC908F001D4F14349457 /* KeychainService.swift */,
-				1AE6163D9D4DD786224A69EC /* SecureStorage.swift */,
-			);
-			path = Security;
 			sourceTree = "<group>";
 		};
 		1AFF32509F3843FFADE96C27 /* Models */ = {
@@ -390,35 +264,6 @@
 				1A402F27AE08365457D9DA52 /* UserModel.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		1AF091EF30B3A49D7FBC2A68 /* Utilities */ = {
-			isa = PBXGroup;
-			children = (
-				1AC3C66AE93071784B2930E1 /* DateFormatter+Yoru.swift */,
-				1A7321962A5B455AAF68860B /* Logger.swift */,
-			);
-			path = Utilities;
-			sourceTree = "<group>";
-		};
-		1A8440A4853180F03BBEAAD2 /* TDLib */ = {
-			isa = PBXGroup;
-			children = (
-				1A0CDDFE0615FFB5D64EF790 /* TDLibBridge.swift */,
-				1A49E87E54431BCD1EF92E87 /* TDLibJsonClient.swift */,
-			);
-			path = TDLib;
-			sourceTree = "<group>";
-		};
-		1ABF54E20DF95633DFD4F7A6 /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				1A27A0F8CBAF8770669218F6 /* SecuritySettingsView.swift */,
-				1AD71E64D24C2F9D745DFBAB /* SettingsView.swift */,
-				1A0D6664A82B8F5F73BCA2B5 /* SettingsViewModel.swift */,
-				1AEF6E15E5C652FEEA301A43 /* ThemeSettingsView.swift */,
-			);
-			path = Settings;
 			sourceTree = "<group>";
 		};
 		1A457D49D02378D8159657C3 /* Labs */ = {
@@ -437,40 +282,39 @@
 			path = Labs;
 			sourceTree = "<group>";
 		};
-		1AE08BFBC7F41012E4A16BA1 /* Inputs */ = {
+		1ABD37F29BA8861322FCF12B /* Bubbles */ = {
 			isa = PBXGroup;
 			children = (
-				1A719718715FB0912C619DE9 /* ChatInputField.swift */,
-				1A447C0DE37176D2ED86A823 /* YoruTextField.swift */,
+				1A28E7B1EC6B2B390421FE51 /* MessageBubbleView.swift */,
 			);
-			path = Inputs;
+			path = Bubbles;
 			sourceTree = "<group>";
 		};
-		1A6135DB7497788A2FCA61F8 /* Avatars */ = {
+		1AF091EF30B3A49D7FBC2A68 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				1AD37640827F99A0543053D4 /* YoruAvatarView.swift */,
+				1AC3C66AE93071784B2930E1 /* DateFormatter+Yoru.swift */,
+				1A7321962A5B455AAF68860B /* Logger.swift */,
 			);
-			path = Avatars;
+			path = Utilities;
 			sourceTree = "<group>";
 		};
-		1ABD7CDA00D3306919B848C4 /* EmptyStates */ = {
+		1AC1974A2C6AA30BC2456431 /* Mock */ = {
 			isa = PBXGroup;
 			children = (
-				1A9BA156E89943429505FA41 /* EmptyStateView.swift */,
+				1A5DBCF9A4F8EB96D7CAB587 /* MockDataGenerator.swift */,
+				1AD10847D325D521A83649F3 /* MockTelegramClient.swift */,
 			);
-			path = EmptyStates;
+			path = Mock;
 			sourceTree = "<group>";
 		};
-		1AEE51614273AFE09F14E693 /* Auth */ = {
+		1A624DA6A3A0FAB7B10E519A /* Contacts */ = {
 			isa = PBXGroup;
 			children = (
-				1AAFF4C53EBDD7535817CEF6 /* AuthCodeView.swift */,
-				1AB515B41569FF9AD50F9A83 /* AuthViewModel.swift */,
-				1AF3C9212BAF29D5200F2284 /* PasswordView.swift */,
-				1A3E7B06942E2EBC10588E50 /* PhoneNumberView.swift */,
+				1AA33AFF3687F6B8B6E149FF /* ContactsView.swift */,
+				1A9696DE4EC9C222D7089A5D /* ContactsViewModel.swift */,
 			);
-			path = Auth;
+			path = Contacts;
 			sourceTree = "<group>";
 		};
 		1A0FD8EC81730DB8E2FC91BA /* Badges */ = {
@@ -492,15 +336,160 @@
 			path = Onboarding;
 			sourceTree = "<group>";
 		};
-		1A63FB79D8432E92B2BF05B7 /* Core */ = {
+		1ABF54E20DF95633DFD4F7A6 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				1A9F350D0217F2BC84F40252 /* DesignSystem */,
-				1A888B54E6A05D73C9C9C635 /* Labs */,
-				1AC17587865C5280FD24261F /* Security */,
-				1AF091EF30B3A49D7FBC2A68 /* Utilities */,
+				1A27A0F8CBAF8770669218F6 /* SecuritySettingsView.swift */,
+				1AD71E64D24C2F9D745DFBAB /* SettingsView.swift */,
+				1A0D6664A82B8F5F73BCA2B5 /* SettingsViewModel.swift */,
+				1AEF6E15E5C652FEEA301A43 /* ThemeSettingsView.swift */,
 			);
-			path = Core;
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		1A2722CF3C745C7A874827DA /* Buttons */ = {
+			isa = PBXGroup;
+			children = (
+				1AF439BDC5C10BAF5644D2B3 /* CyberIconButton.swift */,
+				1AFDCD7F9E703CA9AEE12A03 /* YoruButton.swift */,
+			);
+			path = Buttons;
+			sourceTree = "<group>";
+		};
+		1AC17587865C5280FD24261F /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				1AAEBC908F001D4F14349457 /* KeychainService.swift */,
+				1AE6163D9D4DD786224A69EC /* SecureStorage.swift */,
+			);
+			path = Security;
+			sourceTree = "<group>";
+		};
+		1A909911ED58F981BD48B26E /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				1A7D85FCA5C19DB01571B5FE /* TelegramClientProtocol.swift */,
+				1A670956E4B405022CFCAE58 /* TelegramService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		1A8440A4853180F03BBEAAD2 /* TDLib */ = {
+			isa = PBXGroup;
+			children = (
+				1A0CDDFE0615FFB5D64EF790 /* TDLibBridge.swift */,
+				1A49E87E54431BCD1EF92E87 /* TDLibJsonClient.swift */,
+			);
+			path = TDLib;
+			sourceTree = "<group>";
+		};
+		1AE08BFBC7F41012E4A16BA1 /* Inputs */ = {
+			isa = PBXGroup;
+			children = (
+				1A719718715FB0912C619DE9 /* ChatInputField.swift */,
+				1A447C0DE37176D2ED86A823 /* YoruTextField.swift */,
+			);
+			path = Inputs;
+			sourceTree = "<group>";
+		};
+		1A888B54E6A05D73C9C9C635 /* Labs */ = {
+			isa = PBXGroup;
+			children = (
+				1A025F217C10B15A40D5D3A7 /* BiometricAuthService.swift */,
+				1A3C46AF7F273A6E99DD9FF6 /* MessageFilterEngine.swift */,
+				1A8A2EA3C26DB57010940805 /* MessageHistoryVault.swift */,
+				1A480D1B68F2A0F2F6200998 /* YoruLabsManager.swift */,
+				1AA763A08C1A2314CD8E86E0 /* YoruLabsSettings.swift */,
+				1A88B206D8838E70A0632FBA /* YoruLabsStore.swift */,
+			);
+			path = Labs;
+			sourceTree = "<group>";
+		};
+		1ABD7CDA00D3306919B848C4 /* EmptyStates */ = {
+			isa = PBXGroup;
+			children = (
+				1A9BA156E89943429505FA41 /* EmptyStateView.swift */,
+			);
+			path = EmptyStates;
+			sourceTree = "<group>";
+		};
+		1AB8D15FD0D7F4CDF5F44163 /* Conversation */ = {
+			isa = PBXGroup;
+			children = (
+				1AA6A9E30ED08936D857375A /* ConversationHeaderView.swift */,
+				1A622D9580D68BC197C0D070 /* ConversationView.swift */,
+				1AD40159229F9B862150F234 /* ConversationViewModel.swift */,
+				1A78FC05403E8FFB40C29311 /* MessageListView.swift */,
+			);
+			path = Conversation;
+			sourceTree = "<group>";
+		};
+		1A9F350D0217F2BC84F40252 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				1A452709C6AFEEEBDD81111E /* Colors */,
+				1AFB63534E7E95CDAF0A69AF /* Effects */,
+				1ABAD6DF44EE04467385B528 /* Motion */,
+				1A9C19D971A9830969D34ADA /* Theme */,
+				1A90A0E6855DFCD4040F245B /* Typography */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		1A6135DB7497788A2FCA61F8 /* Avatars */ = {
+			isa = PBXGroup;
+			children = (
+				1AD37640827F99A0543053D4 /* YoruAvatarView.swift */,
+			);
+			path = Avatars;
+			sourceTree = "<group>";
+		};
+		1AEE51614273AFE09F14E693 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				1AAFF4C53EBDD7535817CEF6 /* AuthCodeView.swift */,
+				1AB515B41569FF9AD50F9A83 /* AuthViewModel.swift */,
+				1AF3C9212BAF29D5200F2284 /* PasswordView.swift */,
+				1A3E7B06942E2EBC10588E50 /* PhoneNumberView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		1A345CB705B0054BA81ACDB0 /* Profiles */ = {
+			isa = PBXGroup;
+			children = (
+				1A94A9BCE5675957BB164B71 /* ProfileViewModel.swift */,
+				1AFBB1BF24CBAE54E78B1135 /* UserProfileView.swift */,
+			);
+			path = Profiles;
+			sourceTree = "<group>";
+		};
+		1A842D71C63479D2DFD941CE /* Chats */ = {
+			isa = PBXGroup;
+			children = (
+				1A431EE9C8A64713C818AF48 /* ChatFolderBar.swift */,
+				1A5AB627AC14AAA8F910CDD1 /* ChatListView.swift */,
+				1AFA7384A02D6B04DA25FF87 /* ChatListViewModel.swift */,
+				1A591A43ADFCF2F87843E6FC /* ChatRowView.swift */,
+			);
+			path = Chats;
+			sourceTree = "<group>";
+		};
+		1A516A7D41BA144F6BFC16D1 /* TabBar */ = {
+			isa = PBXGroup;
+			children = (
+				1AF6CF484DBC4D65C72D902C /* CustomTabBar.swift */,
+			);
+			path = TabBar;
+			sourceTree = "<group>";
+		};
+		1A022D1C8B6AD404BEECED8C /* Cards */ = {
+			isa = PBXGroup;
+			children = (
+				1A0FCB644E586625AAB1BC62 /* CyberCard.swift */,
+				1AFDAA3C86033FA5D88A3DED /* ProfileCard.swift */,
+			);
+			path = Cards;
 			sourceTree = "<group>";
 		};
 		1AD194E680229EC86D74432D /* Components */ = {
@@ -518,16 +507,6 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
-		1AC037C483DC6B00C463C5F9 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				1AD9A08C62A8886C3D0E08B9 /* AppCoordinator.swift */,
-				1A48ABB00470CC233B74010E /* AppState.swift */,
-				1A6DAC3CA05ECF328C512FAF /* YoruApp.swift */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
 		1ABCA3AA88E186E548666A06 /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -542,6 +521,27 @@
 				1ABF54E20DF95633DFD4F7A6 /* Settings */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		1AC037C483DC6B00C463C5F9 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				1AD9A08C62A8886C3D0E08B9 /* AppCoordinator.swift */,
+				1A48ABB00470CC233B74010E /* AppState.swift */,
+				1A6DAC3CA05ECF328C512FAF /* YoruApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		1A63FB79D8432E92B2BF05B7 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				1A9F350D0217F2BC84F40252 /* DesignSystem */,
+				1A888B54E6A05D73C9C9C635 /* Labs */,
+				1AC17587865C5280FD24261F /* Security */,
+				1AF091EF30B3A49D7FBC2A68 /* Utilities */,
+			);
+			path = Core;
 			sourceTree = "<group>";
 		};
 		1ABE0CD79982DD1EBF534B12 /* Telegram */ = {
@@ -781,7 +781,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.10;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -801,7 +801,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.10;
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -827,7 +827,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.yoru.client;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.10;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -853,7 +853,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.yoru.client;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.10;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

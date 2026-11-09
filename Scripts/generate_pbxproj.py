@@ -326,7 +326,7 @@ def main():
 \t\t\t\tSDKROOT = iphoneos;
 \t\t\t\tSWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 \t\t\t\tSWIFT_OPTIMIZATION_LEVEL = "-Onone";
-\t\t\t\tSWIFT_VERSION = 5.10;
+\t\t\t\tSWIFT_VERSION = 5.0;
 \t\t\t}};
 \t\t\tname = Debug;
 \t\t}};
@@ -346,7 +346,7 @@ def main():
 \t\t\t\tSDKROOT = iphoneos;
 \t\t\t\tSWIFT_COMPILATION_MODE = wholemodule;
 \t\t\t\tSWIFT_OPTIMIZATION_LEVEL = "-O";
-\t\t\t\tSWIFT_VERSION = 5.10;
+\t\t\t\tSWIFT_VERSION = 5.0;
 \t\t\t\tVALIDATE_PRODUCT = YES;
 \t\t\t}};
 \t\t\tname = Release;
@@ -371,7 +371,7 @@ def main():
 \t\t\t\tMARKETING_VERSION = 0.1.0;
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.yoru.client;
 \t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";
-\t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;\n\t\t\t\tSWIFT_VERSION = 5.10;
+\t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;\n\t\t\t\tSWIFT_VERSION = 5.0;
 \t\t\t\tTARGETED_DEVICE_FAMILY = 1;
 \t\t\t}};
 \t\t\tname = Debug;
@@ -396,7 +396,7 @@ def main():
 \t\t\t\tMARKETING_VERSION = 0.1.0;
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.yoru.client;
 \t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";
-\t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;\n\t\t\t\tSWIFT_VERSION = 5.10;
+\t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;\n\t\t\t\tSWIFT_VERSION = 5.0;
 \t\t\t\tTARGETED_DEVICE_FAMILY = 1;
 \t\t\t}};
 \t\t\tname = Release;

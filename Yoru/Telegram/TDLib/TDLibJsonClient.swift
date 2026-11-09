@@ -35,6 +35,14 @@ public final class TDLibJsonClient: TelegramClientProtocol {
     private var currentMeUser: TelegramUser?
     private let cacheLock = NSLock()
 
+    // Stored initialization parameters for sequential TDLib state machine dispatch
+    private var isParametersSent = false
+    private var useTestDC: Bool = false
+    private var configuredApiId: Int = 0
+    private var configuredApiHash: String = ""
+    private var configuredDbDir: String = ""
+    private var configuredFilesDir: String = ""
+
     public lazy var authStateStream: AsyncStream<TelegramAuthState> = {
         AsyncStream { continuation in
             self.authContinuation = continuation
@@ -62,11 +70,14 @@ public final class TDLibJsonClient: TelegramClientProtocol {
     }
 
     public func initialize() async throws {
-        try await bridge.createClient()
-        startReceiveLoop()
+        try await initialize(useTestDC: false)
+    }
 
-        // TDLib Parameters initialization
-        let dbKey = SecureStorage.shared.getOrCreateTDLibEncryptionKey()
+    public func initialize(useTestDC: Bool) async throws {
+        self.useTestDC = useTestDC
+        self.isParametersSent = false
+
+        // 1. Resolve and validate credentials
         let rawApiId = Bundle.main.object(forInfoDictionaryKey: "YORU_TELEGRAM_API_ID")
         let apiId: Int = {
             if let intVal = rawApiId as? Int { return intVal }
@@ -83,32 +94,28 @@ public final class TDLibJsonClient: TelegramClientProtocol {
             )
         }
 
+        self.configuredApiId = apiId
+        self.configuredApiHash = apiHash
+
+        // 2. Resolve database and file storage paths
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let tdlibDir = documentsDirectory.appendingPathComponent("tdlib", isDirectory: true)
-        let tdlibFilesDir = documentsDirectory.appendingPathComponent("tdlib_files", isDirectory: true)
+        let subfolder = useTestDC ? "tdlib_test" : "tdlib"
+        let filesSubfolder = useTestDC ? "tdlib_files_test" : "tdlib_files"
+        let tdlibDir = documentsDirectory.appendingPathComponent(subfolder, isDirectory: true)
+        let tdlibFilesDir = documentsDirectory.appendingPathComponent(filesSubfolder, isDirectory: true)
 
         try FileManager.default.createDirectory(at: tdlibDir, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: tdlibFilesDir, withIntermediateDirectories: true)
 
-        let setParams: [String: Any] = [
-            "@type": "setTdlibParameters",
-            "database_directory": tdlibDir.path,
-            "files_directory": tdlibFilesDir.path,
-            "database_encryption_key": dbKey,
-            "use_message_database": true,
-            "use_chat_info_database": true,
-            "use_file_database": true,
-            "use_secret_chats": false,
-            "api_id": apiId,
-            "api_hash": apiHash,
-            "system_language_code": Locale.current.language.languageCode?.identifier ?? "en",
-            "device_model": "iPhone 17 Pro Max",
-            "system_version": "iOS 17.0",
-            "application_version": "0.1.0"
-        ]
+        self.configuredDbDir = tdlibDir.path
+        self.configuredFilesDir = tdlibFilesDir.path
 
-        // Must throw if parameters rejected
-        _ = try await executeQuery(setParams)
+        // 3. Initialize native client instance and start background event loop
+        try await bridge.createClient()
+        startReceiveLoop()
+
+        // Note: setTdlibParameters is dispatched exclusively in response to
+        // authorizationStateWaitTdlibParameters event according to official TDLib state machine.
     }
 
     public func close() async {
@@ -257,17 +264,53 @@ public final class TDLibJsonClient: TelegramClientProtocol {
         }
     }
 
+    private func sendTdlibParameters() async {
+        guard !isParametersSent else { return }
+        isParametersSent = true
+
+        let setParams: [String: Any] = [
+            "@type": "setTdlibParameters",
+            "use_test_dc": useTestDC,
+            "database_directory": configuredDbDir,
+            "files_directory": configuredFilesDir,
+            "use_file_database": true,
+            "use_chat_info_database": true,
+            "use_message_database": true,
+            "use_secret_chats": false,
+            "api_id": configuredApiId,
+            "api_hash": configuredApiHash,
+            "system_language_code": Locale.current.language.languageCode?.identifier ?? "en",
+            "device_model": "iPhone 17 Pro Max",
+            "system_version": "iOS 17.0",
+            "application_version": "0.1.0",
+            "enable_storage_optimizer": true
+        ]
+
+        do {
+            _ = try await executeQuery(setParams)
+        } catch {
+            authContinuation?.yield(.error("setTdlibParameters rejected by TDLib: \(error.localizedDescription)"))
+        }
+    }
+
     private func mapAuthState(_ type: String, payload: [String: Any]) {
         switch type {
         case "authorizationStateWaitTdlibParameters":
             authContinuation?.yield(.waitingForParameters)
+            Task { [weak self] in
+                await self?.sendTdlibParameters()
+            }
         case "authorizationStateWaitEncryptionKey":
-            Task {
+            Task { [weak self] in
                 let dbKey = SecureStorage.shared.getOrCreateTDLibEncryptionKey()
-                _ = try? await self.executeQuery([
-                    "@type": "checkDatabaseEncryptionKey",
-                    "encryption_key": dbKey
-                ])
+                do {
+                    _ = try await self?.executeQuery([
+                        "@type": "checkDatabaseEncryptionKey",
+                        "encryption_key": dbKey
+                    ])
+                } catch {
+                    self?.authContinuation?.yield(.error("checkDatabaseEncryptionKey rejected: \(error.localizedDescription)"))
+                }
             }
         case "authorizationStateWaitPhoneNumber":
             authContinuation?.yield(.waitingForPhoneNumber)

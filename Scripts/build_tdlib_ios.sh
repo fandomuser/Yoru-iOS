@@ -30,6 +30,11 @@ if [ ! -d "td" ]; then
     git clone --depth 1 --branch "${TDLIB_BRANCH}" "${TDLIB_REPO}" td
 fi
 
+if [ -f "td/example/ios/build-openssl.sh" ] && [ ! -d "td/example/ios/third_party/openssl" ]; then
+    echo "=== [2.5/6] Building OpenSSL dependency for Apple Platforms ==="
+    (cd td/example/ios && ./build-openssl.sh)
+fi
+
 echo "=== [3/6] Compiling TDLib for iOS Device (arm64) ==="
 mkdir -p build_device
 cd build_device

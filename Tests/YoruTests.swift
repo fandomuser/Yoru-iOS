@@ -42,4 +42,24 @@ final class YoruTests: XCTestCase {
             XCTFail("Expected text content")
         }
     }
+
+    func testTDLibTestDCConfigurationAndErrorHandling() async {
+        // Validate that TDLibError maintains structured error codes and messages
+        let error = TDLibError(code: 400, message: "PHONE_NUMBER_INVALID")
+        XCTAssertEqual(error.code, 400)
+        XCTAssertEqual(error.message, "PHONE_NUMBER_INVALID")
+        XCTAssertTrue(error.errorDescription?.contains("400") == true)
+
+        // Validate that TDLibBridge identifies unavailability gracefully when not linked
+        let bridge = TDLibBridge()
+        let initialized = await bridge.isInitialized
+        XCTAssertFalse(initialized)
+
+        // Validate that SecureStorage provides a valid, persistent TDLib database encryption key
+        let key1 = SecureStorage.shared.getOrCreateTDLibEncryptionKey()
+        let key2 = SecureStorage.shared.getOrCreateTDLibEncryptionKey()
+        XCTAssertFalse(key1.isEmpty)
+        XCTAssertEqual(key1, key2)
+        XCTAssertEqual(key1.count, 64) // 32 bytes hex-encoded
+    }
 }

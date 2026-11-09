@@ -35,19 +35,29 @@ jobs:
           CURRENT_PROJECT_VERSION = 1
           TARGETED_DEVICE_FAMILY = 1
           IPHONEOS_DEPLOYMENT_TARGET = 17.0
-          SWIFT_VERSION = 5.10
+          SWIFT_VERSION = 5.0
           ENABLE_USER_SCRIPT_SANDBOXING = YES
           EOF
 
-      - name: Setup TDLib Framework
+      - name: Fetch and Verify Real Official TDLib XCFramework
         run: |
-          chmod +x Scripts/setup_framework.sh
-          bash Scripts/setup_framework.sh
+          chmod +x Scripts/fetch_real_tdlib.sh
+          bash Scripts/fetch_real_tdlib.sh
+          # Fail hard if real binary is missing or a mock
+          echo "=== Inspecting Real TDLib Binary Architecture Slices ==="
+          REAL_BIN=$(find Yoru/Frameworks/TDLibFramework.xcframework -name "TDLibFramework" -o -name "libtdjson.dylib" | head -n 1)
+          if [ -z "$REAL_BIN" ]; then
+            echo "[!] ERROR: No TDLib binary found in Yoru/Frameworks/TDLibFramework.xcframework"
+            exit 1
+          fi
+          lipo -info "$REAL_BIN"
+          file "$REAL_BIN"
+          ls -lh "$REAL_BIN"
 
-      - name: Run Python Codebase & Syntax Verification
+      - name: Run Source Structure and Lexical Lint
         run: |
           python3 Scripts/verify_structure.py
-          python3 Scripts/static_check.py
+          python3 Scripts/source_structure_lint.py
 
       - name: Run Swift Package Unit Tests
         run: |

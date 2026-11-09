@@ -122,8 +122,8 @@ REQUIRED_FILES = [
     "Tests/YoruTests.swift",
     "Tests/YoruLabsTests.swift",
     "Scripts/build_tdlib_ios.sh",
-    "Scripts/setup_framework.sh",
-    "Scripts/static_check.py",
+    "Scripts/fetch_real_tdlib.sh",
+    "Scripts/source_structure_lint.py",
     "Scripts/generate_pbxproj.py",
     ".github/workflows/ios-ci.yml"
 ]

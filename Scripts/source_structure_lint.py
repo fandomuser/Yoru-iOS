@@ -1,4 +1,19 @@
+#!/usr/bin/env bash
 #!/usr/bin/env python3
+"""
+YORU (夜) — Source Structure and Token Linter
+=============================================================================
+IMPORTANT: This script performs lexical regular-expression scanning and
+bracket balance verification only. It DOES NOT perform Swift AST parsing,
+symbol resolution, or type checking. It is designed to catch simple syntax
+regressions (e.g., accidental Objective-C string literals or unmatched braces)
+on non-macOS workstations before code is submitted to Xcode/CI.
+
+Actual Swift compilation is performed exclusively by swiftc / xcodebuild
+in the macOS build environment.
+=============================================================================
+"""
+
 import os
 import re
 import sys
@@ -30,14 +45,16 @@ def main():
                     if open_b != close_b:
                         errors.append(f"{rel_path}: Mismatched braces (open: {open_b}, close: {close_b})")
 
-    print(f"Audited {total_files} Swift source files across Yoru and Tests.")
+    print(f"Scanned {total_files} Swift source files across Yoru and Tests.")
     if errors:
-        print(f"[!] FAILED with {len(errors)} errors:")
+        print(f"[!] FAILED: Found {len(errors)} lexical syntax defects:")
         for e in errors:
             print(f"  - {e}")
         sys.exit(1)
     else:
-        print("[+] SUCCESS: All 80 Swift files passed static structural and syntax checks!")
+        print(f"[+] LINT PASSED: All {total_files} Swift files passed lexical token and delimiter scanning.")
+        print("    [NOTE] This is a pre-commit lexical sanity check, NOT Swift compilation.")
+        print("    [NOTE] Official compilation is executed via Xcode / swiftc on macOS.")
 
 if __name__ == "__main__":
     main()

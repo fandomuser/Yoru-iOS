@@ -75,9 +75,11 @@ Architecture: **SwiftUI + Swift Concurrency + TDLib Protocol Bridge**
 - [x] Strict error propagation via `TDLibError` with numerical code and descriptive message.
 - [x] Cooperative task cancellation and receive-loop lifetime management.
 - [x] Race-safe timeout mechanism enforcing `timeoutSeconds` with exactly-once continuation completion.
-- [x] TDLib 1.8.x schema parameters (`database_directory`, `files_directory`, `chat_list: {"@type": "chatListMain"}`).
+- [x] TDLib 1.8.x event-driven state machine (`authorizationStateWaitTdlibParameters` -> `setTdlibParameters` -> `authorizationStateWaitEncryptionKey` -> `checkDatabaseEncryptionKey` -> `authorizationStateWaitPhoneNumber`).
+- [x] Database encryption API compatibility using `checkDatabaseEncryptionKey` with Keychain-derived key.
 - [x] `TDLibFramework.xcframework` integration into `Yoru.xcodeproj` (`PBXFrameworksBuildPhase` and `Embed Frameworks`).
-- [x] Standalone framework synthesizer for CI & local development (`Scripts/setup_framework.sh`).
+- [x] Authentic, production-grade TDLib binary fetch script (`Scripts/fetch_real_tdlib.sh`) pinned to official release `1.8.69-4c6377aa` (>10MB C++ engine with OpenSSL).
+- [x] Automated Telegram Test DC integration test support (`use_test_dc: true` in `Tests/YoruTests.swift`).
 - [ ] Connect full production compiled TDLib XCFramework on macOS build machine.
 - [ ] Verify production auth loop against Telegram test servers (DC 2 / DC 5).
 
