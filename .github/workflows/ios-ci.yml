@@ -86,6 +86,9 @@ jobs:
       - name: Validate Xcode Project Build for iOS Simulator
         run: |
           set -o pipefail
+          echo "=== Inspecting Xcode Schemes & Targets ==="
+          xcodebuild -list -project Yoru.xcodeproj
+          echo "=== Executing iOS Simulator Build ==="
           xcodebuild build \
             -project Yoru.xcodeproj \
             -scheme Yoru \
@@ -99,6 +102,9 @@ jobs:
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 120 xcodebuild.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -E "error:" xcodebuild.log | head -n 30 | while IFS= read -r line; do
+              echo "::error::$line"
+            done
             exit $STATUS
           }
           echo "### Xcode Simulator Build Succeeded Successfully" >> $GITHUB_STEP_SUMMARY
