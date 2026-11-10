@@ -53,7 +53,6 @@ jobs:
             --configurationPath="build-system/appstore-configuration.json" \
             --codesigningInformationPath="build-system/fake-codesigning" \
             --configuration=debug_sim_arm64 \
-            --disableProvisioningProfiles \
             --buildNumber=100001 2>&1 | tee telegram_build.log || {
             STATUS=$?
             echo "### Telegram Baseline Build Failed (Exit Code: $STATUS)" >> $GITHUB_STEP_SUMMARY
