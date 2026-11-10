@@ -1,0 +1,96 @@
+name: Official Telegram Baseline Build
+
+on:
+  push:
+    branches: [ telegram-baseline, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  build:
+    name: Build Official Telegram iOS for Simulator
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout Codebase with Submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Select Xcode Version
+        run: |
+          echo "=== Available Xcode Versions ==="
+          ls -d /Applications/Xcode* || true
+          if [ -d "/Applications/Xcode_16.0.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer
+          elif [ -d "/Applications/Xcode_16.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer
+          elif [ -d "/Applications/Xcode_15.4.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+          else
+            echo "Using default Xcode: $(xcode-select -p)"
+          fi
+          xcodebuild -version
+
+      - name: Setup Build Environment & Certificates
+        run: |
+          set -euo pipefail
+          python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
+
+      - name: Execute Official Telegram Bazel Build
+        run: |
+          set -o pipefail
+          mkdir -p "$HOME/telegram-bazel-cache"
+          
+          echo "=== Executing Make.py for debug_sim_arm64 ==="
+          python3 -u build-system/Make/Make.py \
+            --overrideXcodeVersion \
+            --cacheDir="$HOME/telegram-bazel-cache" \
+            build \
+            --configurationPath="build-system/appstore-configuration.json" \
+            --codesigningInformationPath="build-system/fake-codesigning" \
+            --configuration=debug_sim_arm64 \
+            --disableProvisioningProfiles \
+            --buildNumber=100001 2>&1 | tee telegram_build.log || {
+            STATUS=$?
+            echo "### Telegram Baseline Build Failed (Exit Code: $STATUS)" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 120 telegram_build.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit $STATUS
+          }
+          echo "### Telegram Baseline Build Succeeded Successfully" >> $GITHUB_STEP_SUMMARY
+
+      - name: Verify Build Artifacts
+        if: success()
+        run: |
+          echo "=== Inspecting Built Artifacts ==="
+          ls -la bazel-bin/Telegram/ || true
+          find bazel-bin -name "*.app" -o -name "*.ipa" || true
+
+      - name: Publish Logs as Public Release Asset
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f telegram_build.log ]; then
+            gh release create telegram-baseline-logs \
+              telegram_build.log \
+              --title "Telegram Baseline Build Logs" \
+              --notes "Automated build logs from official Telegram baseline" || \
+            gh release upload telegram-baseline-logs \
+              telegram_build.log \
+              --clobber || true
+          fi
+
+      - name: Upload Build Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: telegram-build-log
+          path: telegram_build.log
+          if-no-files-found: ignore

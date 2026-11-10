@@ -1,0 +1,13 @@
+{
+	"bundle_id": "org.yoru.development.Telegram",
+	"api_id": "111111",
+	"api_hash": "00112233445566778899aabbccddeeff",
+	"team_id": "XXXXXXXXXX",
+	"is_internal_build": "true",
+	"is_appstore_build": "false",
+	"appstore_id": "0",
+	"app_specific_url_scheme": "tg",
+	"premium_iap_product_id": "",
+	"enable_siri": false,
+	"enable_icloud": false
+}
