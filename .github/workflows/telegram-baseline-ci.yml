@@ -36,6 +36,11 @@ jobs:
           fi
           xcodebuild -version
 
+      - name: Patch Bazel Rules for Xcode 16 Compatibility
+        run: |
+          echo "=== Patching Bazel rules for Xcode 16 version alignment ==="
+          find build-system/bazel-rules -name "*.bzl" -exec sed -i '' 's/"26.0"/"16.0"/g' {} +
+
       - name: Setup Build Environment & Certificates
         run: |
           python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs || echo "Certificate import warning: non-zero exit code, continuing..."
