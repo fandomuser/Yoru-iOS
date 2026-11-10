@@ -40,6 +40,8 @@ jobs:
         run: |
           echo "=== Patching Bazel rules for Xcode 16 version alignment ==="
           find build-system/bazel-rules -name "*.bzl" -exec sed -i '' 's/"26.0"/"16.0"/g' {} +
+          echo "=== Patching plisttool to ignore expired fake provisioning profiles ==="
+          sed -i '' 's/if expire and expire < datetime.datetime.now():/if False:/g' build-system/bazel-rules/rules_apple/tools/plisttool/plisttool.py
 
       - name: Setup Build Environment & Certificates
         run: |
