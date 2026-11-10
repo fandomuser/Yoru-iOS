@@ -1645,7 +1645,9 @@ void IDPrivateSynchronizeTextInputTraits(
         @selector(setAllowedWritingToolsResultOptions:),
         source.allowedWritingToolsResultOptions);
     ID_SET_OBJECT_TRAIT("ConversationContext", source.conversationContext);
-    ID_SET_BOOL_TRAIT("AllowsNumberPadPopover", source.allowsNumberPadPopover);
+    SEL allowsNumberPadPopoverSelector = NSSelectorFromString(@"allowsNumberPadPopover");
+    BOOL allowsNumberPadPopover = [source respondsToSelector:allowsNumberPadPopoverSelector] ? ((BOOL (*)(id, SEL))objc_msgSend)(source, allowsNumberPadPopoverSelector) : NO;
+    ID_SET_BOOL_TRAIT("AllowsNumberPadPopover", allowsNumberPadPopover);
 
 #undef ID_SET_INTEGER_TRAIT
 #undef ID_SET_BOOL_TRAIT
