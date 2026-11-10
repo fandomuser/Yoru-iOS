@@ -2,7 +2,7 @@ name: Official Telegram Baseline Build
 
 on:
   push:
-    branches: [ telegram-baseline, master ]
+    branches: [ telegram-baseline, telegram-baseline-clean, master, main ]
   workflow_dispatch:
 
 permissions:
