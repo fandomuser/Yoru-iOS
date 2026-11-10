@@ -49,5 +49,20 @@ def main():
         else:
             print("Note: actool.bzl target already patched or not found")
 
+    # Patch alticonstool.py so CFBundleIcons dictionary is created if missing
+    alticonstool_path = os.path.join(bazel_rules, 'rules_apple', 'tools', 'alticonstool', 'alticonstool.py')
+    if os.path.exists(alticonstool_path):
+        with open(alticonstool_path, 'r', encoding='utf-8') as fp:
+            c = fp.read()
+        target_iphone = 'plist_data["CFBundleIcons"]["CFBundleAlternateIcons"] = alticons_data'
+        target_ipad = 'plist_data["CFBundleIcons~ipad"]["CFBundleAlternateIcons"] = alticons_data'
+        rep_iphone = 'plist_data.setdefault("CFBundleIcons", {})["CFBundleAlternateIcons"] = alticons_data'
+        rep_ipad = 'plist_data.setdefault("CFBundleIcons~ipad", {})["CFBundleAlternateIcons"] = alticons_data'
+        if target_iphone in c:
+            c = c.replace(target_iphone, rep_iphone).replace(target_ipad, rep_ipad)
+            with open(alticonstool_path, 'w', encoding='utf-8') as fp:
+                fp.write(c)
+            print("Patched alticonstool.py to use setdefault for CFBundleIcons")
+
 if __name__ == '__main__':
     main()
